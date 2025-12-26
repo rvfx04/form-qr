@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Formulario QR</title>
+<script src="https://unpkg.com/html5-qrcode"></script>
+<style>
+body { font-family: Arial; padding: 15px; }
+#reader { width: 100%; max-width: 350px; }
+input, textarea, button {
+  width: 100%; padding: 10px; margin-top: 8px;
+}
+</style>
+</head>
+<body>
+
+<h3>Escanear Código QR</h3>
+
+<div id="reader"></div>
+
+<input id="codigo_qr" placeholder="Código QR" readonly>
+<input id="nombre" placeholder="Nombre">
+<input id="dni" placeholder="DNI">
+<input id="pedido" placeholder="Pedido">
+<input id="area" placeholder="Área">
+<textarea id="observacion" placeholder="Observación"></textarea>
+
+<button onclick="enviar()">Enviar</button>
+
+<div id="resultado"></div>
+
+<script>
+const qr = new Html5Qrcode("reader");
+
+qr.start(
+  { facingMode: "environment" },
+  { fps: 10, qrbox: 250 },
+  text => {
+    document.getElementById("codigo_qr").value = text;
+    qr.stop();
+  }
+);
+
+function enviar() {
+  fetch("https://TU_N8N/webhook/qr-form", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      codigo_qr: codigo_qr.value,
+      nombre: nombre.value,
+      dni: dni.value,
+      pedido: pedido.value,
+      area: area.value,
+      observacion: observacion.value
+    })
+  })
+  .then(r => r.json())
+  .then(d => {
+    resultado.innerHTML =
+      `<b>Registro OK</b><pre>${JSON.stringify(d.datos, null, 2)}</pre>`;
+  });
+}
+</script>
+
+</body>
+</html>
