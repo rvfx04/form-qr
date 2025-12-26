@@ -42,7 +42,7 @@ qr.start(
 );
 
 function enviar() {
-  fetch("https://TU_N8N/webhook/qr-form", {
+  fetch("https://n8n-n8n.eqegkr.easypanel.host/webhook/qr-form", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
