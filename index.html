@@ -124,6 +124,55 @@
             loading.style.display = 'none';
         }
     }
+
+    // ... (tu código anterior) ...
+
+    async function cerrarProceso(rutaId, procesoId) {
+        const usuario = document.getElementById('usuario').value;
+        const partida = document.getElementById('partida').value;
+        
+        if (!confirm("¿Seguro que deseas cerrar este proceso?")) return;
+
+        // Mostrar carga visual (opcional)
+        const btn = event.target; 
+        const textoOriginal = btn.innerText;
+        btn.innerText = "Cerrando...";
+        btn.disabled = true;
+
+        try {
+            const response = await fetch(N8N_WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    action: 'cerrar',   // <--- Esta es la clave para el Router de n8n
+                    usuario: usuario,
+                    partida: partida,
+                    rutaId: rutaId,
+                    procesoId: procesoId
+                })
+            });
+
+            const data = await response.json();
+            
+            // Si todo sale bien, recargamos la tabla para ver el cambio
+            if (data.html) {
+                 // Opción A: Mostrar mensaje de éxito
+                 alert("Proceso cerrado correctamente");
+                 // Recargar la tabla automáticamente
+                 enviarDatos(); 
+            } else {
+                alert("Error al cerrar: " + JSON.stringify(data));
+                btn.innerText = textoOriginal;
+                btn.disabled = false;
+            }
+
+        } catch (error) {
+            alert("Error de conexión: " + error.message);
+            btn.innerText = textoOriginal;
+            btn.disabled = false;
+        }
+    }
+    
 </script>
 
 </body>
