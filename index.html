@@ -49,7 +49,7 @@
 
 <script>
     // --- CONFIGURACIÓN ---
-    // PEGA AQUÍ TU URL DEL WEBHOOK DE N8N (Producción)
+    // URL DEL WEBHOOK DE N8N
     const N8N_WEBHOOK_URL = "https://n8n-n8n.eqegkr.easypanel.host/webhook/taller-control"; 
   
     let html5QrCode;
@@ -64,8 +64,6 @@
             // Éxito al leer
             document.getElementById('partida').value = decodedText;
             stopScanner();
-            // Opcional: Enviar automáticamente al leer
-            // enviarDatos(); 
         }).catch(err => {
             alert("Error al abrir cámara: " + err);
         });
@@ -108,13 +106,9 @@
 
             const data = await response.json();
             
-            // Aquí n8n debe devolverte el HTML de la tabla o un JSON con los datos
-            // Opción A: Si n8n devuelve HTML puro en una propiedad "html"
             if (data.html) {
                 resultArea.innerHTML = data.html;
-            } 
-            // Opción B: Si n8n devuelve datos JSON crudos, aquí los formateas
-            else {
+            } else {
                 resultArea.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
             }
 
@@ -125,15 +119,13 @@
         }
     }
 
-    // ... (tu código anterior) ...
-
     async function cerrarProceso(rutaId, procesoId) {
         const usuario = document.getElementById('usuario').value;
         const partida = document.getElementById('partida').value;
         
         if (!confirm("¿Seguro que deseas cerrar este proceso?")) return;
 
-        // Mostrar carga visual (opcional)
+        // Mostrar carga visual
         const btn = event.target; 
         const textoOriginal = btn.innerText;
         btn.innerText = "Cerrando...";
@@ -144,7 +136,7 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
-                    action: 'cerrar',   // <--- Esta es la clave para el Router de n8n
+                    action: 'cerrar',
                     usuario: usuario,
                     partida: partida,
                     rutaId: rutaId,
@@ -154,12 +146,9 @@
 
             const data = await response.json();
             
-            // Si todo sale bien, recargamos la tabla para ver el cambio
             if (data.html) {
-                 // Opción A: Mostrar mensaje de éxito
                  alert("Proceso cerrado correctamente");
-                 // Recargar la tabla automáticamente
-                 enviarDatos(); 
+                 enviarDatos(); // Recargar tabla
             } else {
                 alert("Error al cerrar: " + JSON.stringify(data));
                 btn.innerText = textoOriginal;
@@ -169,6 +158,50 @@
         } catch (error) {
             alert("Error de conexión: " + error.message);
             btn.innerText = textoOriginal;
+            btn.disabled = false;
+        }
+    }
+
+    // --- NUEVA FUNCIÓN PARA SUPERVISORES ---
+    async function revertirProceso(rutaId, procesoId) {
+        const usuario = document.getElementById('usuario').value;
+        const partida = document.getElementById('partida').value;
+        
+        if (!confirm("⚠️ ¿Seguro que deseas REABRIR (revertir) este proceso?")) return;
+
+        // Mostrar carga visual
+        const btn = event.target; 
+        const textoOriginal = btn.innerHTML; // Guardamos ícono original
+        btn.innerText = "⏳";
+        btn.disabled = true;
+
+        try {
+            const response = await fetch(N8N_WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    action: 'revertir',   // Acción para el router
+                    usuario: usuario,
+                    partida: partida,
+                    rutaId: rutaId,
+                    procesoId: procesoId
+                })
+            });
+
+            const data = await response.json();
+            
+            if (data.html) {
+                 alert("Proceso reabierto correctamente");
+                 enviarDatos(); // Recargar tabla
+            } else {
+                alert("Error al revertir: " + JSON.stringify(data));
+                btn.innerHTML = textoOriginal;
+                btn.disabled = false;
+            }
+
+        } catch (error) {
+            alert("Error de conexión: " + error.message);
+            btn.innerHTML = textoOriginal;
             btn.disabled = false;
         }
     }
