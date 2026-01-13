@@ -148,7 +148,12 @@
             
             if (data.html) {
                  alert("Proceso cerrado correctamente");
-                 enviarDatos(); // Recargar tabla
+                 enviarDatos(); // Recarga la tabla con el PIN actual antes de borrarlo
+                 
+                 // --- AGREGAR ESTA LÍNEA AQUÍ ---
+                 document.getElementById('usuario').value = ""; 
+                 // -------------------------------
+                    
             } else {
                 alert("Error al cerrar: " + JSON.stringify(data));
                 btn.innerText = textoOriginal;
@@ -192,7 +197,11 @@
             
             if (data.html) {
                  alert("Proceso reabierto correctamente");
-                 enviarDatos(); // Recargar tabla
+                 enviarDatos(); // Recarga la tabla
+                 
+                 // --- AGREGAR ESTA LÍNEA AQUÍ ---
+                 document.getElementById('usuario').value = "";
+                 // -------------------------------
             } else {
                 alert("Error al revertir: " + JSON.stringify(data));
                 btn.innerHTML = textoOriginal;
