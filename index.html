@@ -121,6 +121,13 @@
 
     async function cerrarProceso(rutaId, procesoId) {
         const usuario = document.getElementById('usuario').value;
+        // --- VALIDACIÓN DE SEGURIDAD ---
+        if (!usuario) {
+            alert("⚠️ Por seguridad, ingrese su PIN nuevamente para realizar esta acción.");
+            document.getElementById('usuario').focus();
+            return; // Detiene la función aquí
+        }
+        // -------------------------------
         const partida = document.getElementById('partida').value;
         
         if (!confirm("¿Seguro que deseas cerrar este proceso?")) return;
@@ -170,6 +177,13 @@
     // --- NUEVA FUNCIÓN PARA SUPERVISORES ---
     async function revertirProceso(rutaId, procesoId) {
         const usuario = document.getElementById('usuario').value;
+        // --- VALIDACIÓN DE SEGURIDAD ---
+        if (!usuario) {
+            alert("⚠️ Por seguridad, ingrese su PIN nuevamente para realizar esta acción.");
+            document.getElementById('usuario').focus();
+            return; // Detiene la función aquí
+        }
+        // -------------------------------
         const partida = document.getElementById('partida').value;
         
         if (!confirm("⚠️ ¿Seguro que deseas REABRIR (revertir) este proceso?")) return;
